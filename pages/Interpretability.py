@@ -24,6 +24,7 @@ st.markdown('Overall evaluation of 125 classification algorithms used for model 
 mts_data_dir = 'data/mts/settings_one/data'
 mts_scores_dir = 'data/mts/settings_one/scores'
 list_batches = [f for f in os.listdir(mts_data_dir) if 'multivariate_labels' not in f]
+list_batches_multivariate_labels = [f for f in os.listdir(mts_data_dir) if 'multivariate_labels' in f]
 list_algorithms = os.listdir(mts_scores_dir)
 
 # Create tabs for displaying results
@@ -48,6 +49,7 @@ with (tab_overall):
 		batch_id = st.selectbox('Pick synthetic batches',
 								  list_batches,
 								  help="Select one or more datasets for analysis.")
+		batch_multivariate_labels = batch_id.replace('.zip', '.multivariate_labels.zip')
 	
 	# Method selection
 	with col_method_over:
@@ -65,26 +67,35 @@ with (tab_overall):
 	# df = pd.read_csv('data/merged_scores_{}.csv'.format(metric_name))
 	# df = df.set_index('filename')
 
-	batch_df = pd.read_csv(os.path.join(mts_data_dir, batch_id), header=0)
+	batch_df = pd.read_csv(os.path.join(mts_data_dir, batch_id), header=0, compression='zip')
+	batch_multivariate_labels_df = pd.read_csv(os.path.join(mts_data_dir, batch_multivariate_labels), header=0,  compression='zip')
 	num_total_columns = batch_df.shape[1]
 	sensor_columns = [f'Sensor{i}' for i in range(num_total_columns-1)]
 	batch_df.columns = sensor_columns + ['is_anomaly']
+	batch_multivariate_labels_df.columns = sensor_columns
 	print(batch_df[sensor_columns].head())
 
 	scores_dfs_dict = dict()
+	contribution_dfs_dict = dict()
 	for alg in list_algorithms:
-		path = os.path.join(mts_scores_dir, alg, batch_id)
-		if os.path.exists(path):
-			scores_dfs_dict[alg] = pd.read_csv(path, header=None)
+		anomaly_score_path = os.path.join(mts_scores_dir, alg, batch_id)
+		distribution_file_name = batch_id.replace('.zip', '.score_distribution.zip')
+		print('distributionfilename', distribution_file_name)
+		contribution_score_path = os.path.join(mts_scores_dir, alg, distribution_file_name)
+		if os.path.exists(anomaly_score_path):
+			scores_dfs_dict[alg] = pd.read_csv(anomaly_score_path, header=None)
+			contribution_dfs_dict[alg] = pd.read_csv(contribution_score_path, header=None)
+			print(contribution_score_path)
+			print("distribution.shape", contribution_dfs_dict[alg].shape)
 		else:
-			print(f"Path does not exist: {path}")
+			print(f"Path does not exist: {anomaly_score_path}")
 	print(scores_dfs_dict.keys())
 	# Generate dataframe for plotting
 	# df_toplot = generate_dataframe(df, datasets, methods_family, length, type_exp='_score')
 	# st.dataframe(df_toplot)
 
 	# Plot box plot using Plotly
-	plot_batch_mts(batch_df[sensor_columns], scores_dfs_dict)
+	plot_batch_mts(batch_df[sensor_columns], batch_multivariate_labels_df, scores_dfs_dict, contribution_dfs_dict)
 
 # Tab for exploring individual results
 with tab_explore:

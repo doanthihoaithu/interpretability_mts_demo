@@ -141,7 +141,33 @@ def plot_box_plot(df, measure_name, scale='linear'):
 		plt.xscale('log')
 	st.pyplot(fig)
 
-def plot_batch_mts(df, scores_dfs_dict):
+def process_anomaly_index_to_windows(label_ts):
+	windows = []
+	# current_anomaly_window = (label_ts[0], label_ts[0] + window_size)
+	current_start = None
+	current_end = None
+
+	for index, label in label_ts.items():
+		# print(index, label)
+		if label == 0:
+			if current_end is None:
+				current_start = None
+				current_end = None
+			elif current_end is not None:
+				windows.append((current_start, current_end))
+				current_start = None
+				current_end = None
+		elif label == 1:
+			if current_end is None:
+				current_start = index
+				current_end = index
+			else:
+				assert current_start != None
+				current_end = index
+	# print("Anomaly windows", windows)
+	return windows
+
+def plot_batch_mts(df, multivariate_labels_df, scores_dfs_dict, contribution_dfs_dict):
 	"""
 	Plots a batch of multivariate time series using Plotly.
 
@@ -155,18 +181,20 @@ def plot_batch_mts(df, scores_dfs_dict):
 
 	# Create subplots for each time series
 	num_series = len(df.columns)
-	fig = make_subplots(rows=num_series + 1, cols=1, shared_xaxes=True, vertical_spacing=0.02)
+
+	# fig = make_subplots(rows=num_series + 1, cols=1, shared_xaxes=True, vertical_spacing=0.02)
 
 	data = []
 	# Add traces for each time series
 	for i, col in enumerate(df.columns):
 		# print(i, col)
 		# print(df.shape)
-		fig.add_trace(
-			go.Scatter(x=df.index.to_list(), y=df[col].to_list(), mode='lines', name=col),
-			row=i + 1,
-			col=1
-		)
+
+		# fig.add_trace(
+		# 	go.Scatter(x=df.index.to_list(), y=df[col].to_list(), mode='lines', name=col),
+		# 	row=i + 1,
+		# 	col=1
+		# )
 
 		data.append(go.Scatter(x=df.index.to_list(), y=df[col].to_list(),
 							   mode='lines',
@@ -174,20 +202,37 @@ def plot_batch_mts(df, scores_dfs_dict):
 							   xaxis='x',
 							   yaxis='y' if i == 0 else f'y{i+1}'
 							   ),)
+		# anomaly_ts = multivariate_labels_df[multivariate_labels_df[col] == 1.0][col]
+		# data.append(go.Scatter(x=anomaly_ts.index.to_list(), y=df[col][anomaly_ts.index].to_list(),
+		# 					   mode='markers',
+		# 					   fillcolor= 'red',
+		# 					   name=col,
+		# 					   xaxis='x',
+		# 					   yaxis='y' if i == 0 else f'y{i + 1}'
+		# 					   ), )
 
 	if len(scores_dfs_dict.keys()) > 0:
 		# Add traces for each score DataFrame
 		for method_name, scores_df in scores_dfs_dict.items():
-			fig.add_trace(
-				go.Scatter(x=scores_df.index.to_list(), y=scores_df[scores_df.columns[0]].to_list(),
-						   mode='lines', name=f"{method_name} score"),
-				row=num_series + 1,
-				col=1
-			)
+			contribution_df = contribution_dfs_dict[method_name]
+			customdata = []
+			# print('Contribution.shape', contribution_df.shape)
+			# print('Score shape', scores_df.shape)
+			for row_index, row in contribution_df.iterrows():
+				# print(row_index, row)
+				customdata.append('ABC')
+			# print('Contribution shape', len(customdata))
+			# fig.add_trace(
+			# 	go.Scatter(x=scores_df.index.to_list(), y=scores_df[scores_df.columns[0]].to_list(),
+			# 			   mode='lines', name=f"{method_name} score"),
+			# 	row=num_series + 1,
+			# 	col=1
+			# )
 			data.append(go.Scatter(x=scores_df.index.to_list(), y=scores_df[scores_df.columns[0]].to_list(),
 						   mode='lines', name=f"{method_name} score", xaxis='x', yaxis=f'y{num_series+1}',
 								   # customdata=['a:1, b:2, c:3'] * len(scores_df),
-								   # hovertemplate="<b>%{customdata}</b><br>"
+								   customdata=customdata,
+								   hovertemplate="%{y:.4f} Contribution: <b>%{customdata}</b>"
 								   ),)
 
 	layout = dict(
@@ -200,6 +245,23 @@ def plot_batch_mts(df, scores_dfs_dict):
 	)
 
 	fig = go.Figure(data=data, layout=layout)
+	for i, col in enumerate(df.columns):
+		# anomaly_ts = multivariate_labels_df[multivariate_labels_df[col] == 1.0][col]
+		xref = 'x' if i == 0 else f'x{i+1}'
+		yref = 'y' if i == 0 else f'y{i+1}'
+		# for anomaly_index in anomaly_ts.index.to_list():
+		anomaly_windows = process_anomaly_index_to_windows(multivariate_labels_df[col])
+		for start, end in anomaly_windows:
+			# fig.add_vrect(x=anomaly_ts.index.to_list()[0], line_dash='solid', line_color='red', opacity=0.2, xref='x',
+			# 			  yref=yref)
+			fig.add_vrect(x0=start, x1=end, fillcolor='red', line_color='red', opacity=0.2, xref='x', yref=yref)
+		# data.append(go.Scatter(x=anomaly_ts.index.to_list(), y=df[col][anomaly_ts.index].to_list(),
+		# 					   mode='markers',
+		# 					   fillcolor='red',
+		# 					   name=col,
+		# 					   xaxis='x',
+		# 					   yaxis='y' if i == 0 else f'y{i + 1}'
+		# 					   ), )
 
 	# Update layout
 	# fig.update_layout(

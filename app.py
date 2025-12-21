@@ -11,6 +11,8 @@ import pandas as pd
 from omegaconf import DictConfig
 from streamlit import Page
 
+# from streamlit import Page
+
 from pages import Interpretability
 # from st_pages import Page, show_pages, add_page_title
 
@@ -32,25 +34,33 @@ def main(config: DictConfig):
 # 		]
 # 	)
 
-	page_names_to_funcs = {
-		# "—": intro,
-		# "Plotting Demo": plotting_demo,
-		# "Mapping Demo": mapping_demo,
-		# "DataFrame Demo": data_frame_demo
-		'Interpretability': Page("pages/Interpretability.py"),
-	}
+    pg = st.navigation([Page("pages/Interpretability.py")])
+    pg.run()
 
-	demo_name = st.sidebar.selectbox("Choose a demo", page_names_to_funcs.keys())
-	page_names_to_funcs[demo_name]()
 
 
 
 	# Setup
 	# add_page_title() # Optional -- adds the title and icon to the current page
+	#
+	# st.title("Interpretability")
+	# # Show description of the Demo and main image
+	# st.markdown(description_intro)
 
-	st.title("Interpretability")
-	# Show description of the Demo and main image
-	st.markdown(description_intro)
+
+	# page_names_to_funcs = {
+	# 		# "—": intro,
+	# 		# "Plotting Demo": plotting_demo,
+	# 		# "Mapping Demo": mapping_demo,
+	# 		# "DataFrame Demo": data_frame_demo
+	# 		'Interpretability': Page("pages/Interpretability.py"),
+	# 	}
+	#
+	# # demo_name = st.sidebar.selectbox("Choose a demo", page_names_to_funcs.keys())
+	# page_names_to_funcs['Interpretability']()
+
+
+
 	# try:
 	# 	image_path = 'figures/3_pipeline.jpg'
 	# 	image = Image.open(image_path)
