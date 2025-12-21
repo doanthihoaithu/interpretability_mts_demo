@@ -1,4 +1,7 @@
 .idea
 *.iml
 
-**/__pycached__/
+**/__pycache__/
+
+.hydra
+*.log

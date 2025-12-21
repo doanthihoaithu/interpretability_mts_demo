@@ -21,9 +21,9 @@ st.markdown('# Interpretability Evaluation')
 st.markdown('Overall evaluation of 125 classification algorithms used for model selection for anomaly detection. '
 			'We utilize 496 randomly selected time series from the TSB-UAD benchmark.')
 
-mts_data_dir = 'data/mts/data/synthetic'
-mts_scores_dir = 'data/mts/scores/synthetic'
-list_batches = os.listdir(mts_data_dir)
+mts_data_dir = 'data/mts/settings_one/data'
+mts_scores_dir = 'data/mts/settings_one/scores'
+list_batches = [f for f in os.listdir(mts_data_dir) if 'multivariate_labels' not in f]
 list_algorithms = os.listdir(mts_scores_dir)
 
 # Create tabs for displaying results
@@ -62,8 +62,8 @@ with (tab_overall):
 								help="Select the time window lengths applicable to the selected methods.")
 
 	# Loading data from CSV files
-	df = pd.read_csv('data/merged_scores_{}.csv'.format(metric_name))
-	df = df.set_index('filename')
+	# df = pd.read_csv('data/merged_scores_{}.csv'.format(metric_name))
+	# df = df.set_index('filename')
 
 	batch_df = pd.read_csv(os.path.join(mts_data_dir, batch_id), header=0)
 	num_total_columns = batch_df.shape[1]
@@ -73,7 +73,7 @@ with (tab_overall):
 
 	scores_dfs_dict = dict()
 	for alg in list_algorithms:
-		path = os.path.join(mts_scores_dir, alg, 'score', batch_id)
+		path = os.path.join(mts_scores_dir, alg, batch_id)
 		if os.path.exists(path):
 			scores_dfs_dict[alg] = pd.read_csv(path, header=None)
 		else:
@@ -96,8 +96,8 @@ with tab_explore:
 		dataset_exp = st.selectbox('Pick a dataset', all_datasets + ['Upload your own'])
 	
 	# Time series selection based on the chosen dataset
-	with col_ts_exp:
-		time_series_selected_exp = st.selectbox('Pick a time series', list(df.loc[df['dataset'] == dataset_exp].index))
+	# with col_ts_exp:
+	# 	time_series_selected_exp = st.selectbox('Pick a time series', list(df.loc[df['dataset'] == dataset_exp].index))
 	
 	# Window length selection
 	with col_length_exp:

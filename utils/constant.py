@@ -173,7 +173,6 @@ template_names = {
 	'best_ms': 'Best MS',
 	'VUS_PR': 'VUS-PR',
 	'label': 'Label',
-	'best_ms': 'Best MS',
 	'convnet': 'ConvNet',
 	'resnet': 'ResNet',
 	'rocket': 'Rocket',

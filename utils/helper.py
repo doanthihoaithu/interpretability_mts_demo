@@ -186,8 +186,8 @@ def plot_batch_mts(df, scores_dfs_dict):
 			)
 			data.append(go.Scatter(x=scores_df.index.to_list(), y=scores_df[scores_df.columns[0]].to_list(),
 						   mode='lines', name=f"{method_name} score", xaxis='x', yaxis=f'y{num_series+1}',
-								   customdata=['a:1, b:2, c:3'] * len(scores_df),
-								   hovertemplate="<b>%{customdata}</b><br>"
+								   # customdata=['a:1, b:2, c:3'] * len(scores_df),
+								   # hovertemplate="<b>%{customdata}</b><br>"
 								   ),)
 
 	layout = dict(
