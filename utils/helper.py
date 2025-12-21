@@ -220,7 +220,8 @@ def plot_batch_mts(df, multivariate_labels_df, scores_dfs_dict, contribution_dfs
 			# print('Score shape', scores_df.shape)
 			for row_index, row in contribution_df.iterrows():
 				# print(row_index, row)
-				customdata.append('ABC')
+				str_list = ",".join([f'<b>s{i}</b>:{f:.2f}' for i,f in enumerate(row.values.tolist())])
+				customdata.append(str_list)
 			# print('Contribution shape', len(customdata))
 			# fig.add_trace(
 			# 	go.Scatter(x=scores_df.index.to_list(), y=scores_df[scores_df.columns[0]].to_list(),
@@ -232,7 +233,7 @@ def plot_batch_mts(df, multivariate_labels_df, scores_dfs_dict, contribution_dfs
 						   mode='lines', name=f"{method_name} score", xaxis='x', yaxis=f'y{num_series+1}',
 								   # customdata=['a:1, b:2, c:3'] * len(scores_df),
 								   customdata=customdata,
-								   hovertemplate="%{y:.4f} Contribution: <b>%{customdata}</b>"
+								   hovertemplate="%{y:.4f} <b>Contribution</b>: %{customdata}"
 								   ),)
 
 	layout = dict(

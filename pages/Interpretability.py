@@ -83,8 +83,8 @@ with (tab_overall):
 		print('distributionfilename', distribution_file_name)
 		contribution_score_path = os.path.join(mts_scores_dir, alg, distribution_file_name)
 		if os.path.exists(anomaly_score_path):
-			scores_dfs_dict[alg] = pd.read_csv(anomaly_score_path, header=None)
-			contribution_dfs_dict[alg] = pd.read_csv(contribution_score_path, header=None)
+			scores_dfs_dict[alg] = pd.read_csv(anomaly_score_path, header=None, sep='\s+')
+			contribution_dfs_dict[alg] = pd.read_csv(contribution_score_path, header=None, sep='\s+')
 			print(contribution_score_path)
 			print("distribution.shape", contribution_dfs_dict[alg].shape)
 		else:
