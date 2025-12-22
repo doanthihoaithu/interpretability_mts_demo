@@ -1,4 +1,3 @@
-hydra
 st_pages
 streamlit
 pandas
