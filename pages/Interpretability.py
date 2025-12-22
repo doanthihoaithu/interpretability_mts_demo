@@ -23,45 +23,95 @@ st.markdown('Overall evaluation of 125 classification algorithms used for model 
 
 mts_data_dir = 'data/mts/settings_one/data'
 mts_scores_dir = 'data/mts/settings_one/scores'
-list_batches = [f for f in os.listdir(mts_data_dir) if 'multivariate_labels' not in f]
-list_batches_multivariate_labels = [f for f in os.listdir(mts_data_dir) if 'multivariate_labels' in f]
+mts_merged_scores_dir = 'data/mts/settings_one/merged_scores/settings_one'
+
+test_df = pd.read_csv('data/mts/settings_one/merged_scores/settings_one/current_inference_time.csv')
+testing_batch = [f'{f}.zip' for f in test_df['filename'].unique()]
+list_batches = [f for f in os.listdir(mts_data_dir) if 'multivariate_labels' not in f and f in testing_batch]
+list_batches_multivariate_labels = [f for f in os.listdir(mts_data_dir) if 'multivariate_labels' in f and f in testing_batch]
 list_algorithms = os.listdir(mts_scores_dir)
 
 # Create tabs for displaying results
 tab_overall, tab_explore = st.tabs(["Overall results", "Explore the results"])
 
-# Tab for overall results with inline selection
-with (tab_overall):
-	# Setup columns for selecting metric, dataset, method, and window length
+with tab_overall:
 	col_metric_over, col_dataset_over, col_method_over, col_length_over = st.columns([1, 1, 1, 1])
-	
+
 	# Metric selection
 	with col_metric_over:
-		metric_name = st.selectbox('Pick a measure', 
-								   list_measures, 
+		metric_name = st.selectbox('Pick a measure',
+								   list_measures,
 								   help="Select the accuracy metric to evaluate the models.")
 
 	# Dataset selection
 	with col_dataset_over:
+		datasets = st.multiselect('Pick datasets',
+								  ['settings_one'],
+								  default='settings_one',
+								  help="Select one or more datasets for analysis.")
+
+	# Method selection
+	with col_method_over:
+		methods_family = st.multiselect('Pick methods:',
+										list(method_group.keys()),
+										help="Select one or more method groups for comparison.")
+
+	# Window length selection
+	with col_length_over:
+		length = st.multiselect('Pick window lengths:',
+								list_length,
+								help="Select the time window lengths applicable to the selected methods.")
+
+	# Loading data from CSV files
+	df = pd.read_csv('data/mts/settings_one/merged_scores/settings_one/current_accuracy_{}.csv'.format(metric_name))
+	df = df.set_index('filename')
+
+	# Generate dataframe for plotting
+	df_toplot = generate_dataframe(df, datasets, methods_family, length, type_exp='_score')
+	st.dataframe(df_toplot)
+
+	# Plot box plot using Plotly
+	plot_box_plot(df_toplot, measure_name=metric_name)
+
+
+# Tab for overall results with inline selection
+with (tab_explore):
+	# Setup columns for selecting metric, dataset, method, and window length
+	col_dataset_exp, col_ts_exp, col_meth_exp, col_length_exp = st.columns([1, 1, 1, 1])
+	
+	# Metric selection
+	with col_dataset_exp:
+		dataset_exp = st.selectbox('Pick a dataset',
+								   ['settings_one'],
+								   help="Select a synthetic dataset to explore.")
+
+	# Dataset selection
+	with col_ts_exp:
 		# datasets = st.multiselect('Pick datasets',
 		# 						  all_datasets,
 		# 						  help="Select one or more datasets for analysis.")
-		batch_id = st.selectbox('Pick synthetic batches',
+		batch_id = st.selectbox('Pick synthetic batch:',
 								  list_batches,
 								  help="Select one or more datasets for analysis.")
 		batch_multivariate_labels = batch_id.replace('.zip', '.multivariate_labels.zip')
+
+	# Window length selection
+	with col_length_exp:
+		length_selected_exp = st.selectbox('Pick a window length', list_length)
 	
 	# Method selection
-	with col_method_over:
-		methods_family = st.multiselect('Pick methods', 
-										list(method_group.keys()), 
-										help="Select one or more method groups for comparison.")
+	with col_meth_exp:
+		method_selected_exp = st.selectbox('Pick a method', [meth.format(length_selected_exp) for meth in methods_ens])
 	
-	# Window length selection
-	with col_length_over:
-		length = st.multiselect('Pick window lengths', 
-								list_length, 
-								help="Select the time window lengths applicable to the selected methods.")
+
+
+	path_ts = f'data/mts/{dataset_exp}/data/{batch_id}'
+	path_ts_score = {AD_method: f'data/mts/{dataset_exp}/scores/{AD_method}/{batch_id}' for
+					 AD_method in old_method}
+
+	# Display the detector selected by the chosen method
+	st.markdown(
+		f"Detector selected by {method_selected_exp}: {df.at[batch_id.replace('.zip',''), method_selected_exp.replace('_score', '_class')]}")
 
 	# Loading data from CSV files
 	# df = pd.read_csv('data/merged_scores_{}.csv'.format(metric_name))
@@ -98,25 +148,25 @@ with (tab_overall):
 	plot_batch_mts(batch_df[sensor_columns], batch_multivariate_labels_df, scores_dfs_dict, contribution_dfs_dict)
 
 # Tab for exploring individual results
-with tab_explore:
-	# Setup columns for selecting dataset, time series, method, and window length
-	col_dataset_exp, col_ts_exp, col_meth_exp, col_length_exp = st.columns([1, 1, 1, 1])
-	
-	 # Dataset selection, including an option to upload custom dataset
-	with col_dataset_exp:
-		dataset_exp = st.selectbox('Pick a dataset', all_datasets + ['Upload your own'])
-	
-	# Time series selection based on the chosen dataset
-	# with col_ts_exp:
-	# 	time_series_selected_exp = st.selectbox('Pick a time series', list(df.loc[df['dataset'] == dataset_exp].index))
-	
-	# Window length selection
-	with col_length_exp:
-		length_selected_exp = st.selectbox('Pick a window length', list_length)
-	
-	# Method selection, showing methods tailored to selected window length
-	with col_meth_exp:
-		method_selected_exp = st.selectbox('Pick a method', [meth.format(length_selected_exp) for meth in methods_ens])
+# with tab_explore:
+# 	# Setup columns for selecting dataset, time series, method, and window length
+# 	col_dataset_exp, col_ts_exp, col_meth_exp, col_length_exp = st.columns([1, 1, 1, 1])
+#
+# 	 # Dataset selection, including an option to upload custom dataset
+# 	with col_dataset_exp:
+# 		dataset_exp = st.selectbox('Pick a dataset', all_datasets + ['Upload your own'])
+#
+# 	# Time series selection based on the chosen dataset
+# 	# with col_ts_exp:
+# 	# 	time_series_selected_exp = st.selectbox('Pick a time series', list(df.loc[df['dataset'] == dataset_exp].index))
+#
+# 	# Window length selection
+# 	with col_length_exp:
+# 		length_selected_exp = st.selectbox('Pick a window length', list_length)
+#
+# 	# Method selection, showing methods tailored to selected window length
+# 	with col_meth_exp:
+# 		method_selected_exp = st.selectbox('Pick a method', [meth.format(length_selected_exp) for meth in methods_ens])
   	
 	# Custom dataset upload handling
 	# if dataset_exp == 'Upload your own':

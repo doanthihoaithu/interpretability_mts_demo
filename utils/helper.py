@@ -240,7 +240,7 @@ def plot_batch_mts(df, multivariate_labels_df, scores_dfs_dict, contribution_dfs
 		height=100 * (num_series + 1),
 		showlegend=True,
 		hoversubplots="axis",
-		title=dict(text=f'Multivariate Time Series of batch {1}'),
+		title=dict(text=f'Multivariate Time Series of the selected batch'),
 		hovermode="x unified",
 		grid=dict(rows=num_series+1, columns=1),
 	)

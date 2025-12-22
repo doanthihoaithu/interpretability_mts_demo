@@ -27,10 +27,11 @@ We propose a benchmark and an evaluation of 16 time series classifiers used as m
 """
 
 
-list_measures = ['VUS_PR', 'AUC_PR']
+list_measures = ['VUS_PR', 'AUC_PR', 'INTERPRETABILITY_HIT_2_SCORE', 'INTERPRETABILITY_LOG_SCORE']
 
 
-list_length = [16, 32, 64, 128, 256, 512, 768, 1024]
+# list_length = [16, 32, 64, 128, 256, 512, 768, 1024]
+list_length = [32]
 
 dataset_stats_real = ['period_length', 'ratio', 'nb_anomaly', 'average_anom_length',
 	   'median_anom_length', 'std_anom_length', 'data_len']
@@ -61,19 +62,22 @@ methods = ['inception_time_default_16',
 	   'qda_16', 'qda_32', 'qda_64', 'qda_128', 'qda_256', 'qda_512', 'qda_768', 'qda_1024',
 	   'svc_linear_16', 'svc_linear_32', 'svc_linear_64', 'svc_linear_128', 'svc_linear_256', 'svc_linear_512', 'svc_linear_768', 'svc_linear_1024']
 
-old_method = ['IFOREST', 'LOF', 'MP', 'NORMA', 'IFOREST1', 'HBOS', 'OCSVM',
-	   'PCA', 'AE', 'CNN', 'LSTM', 'POLY']
+# old_method = ['IFOREST', 'LOF', 'MP', 'NORMA', 'IFOREST1', 'HBOS', 'OCSVM',
+# 	   'PCA', 'AE', 'CNN', 'LSTM', 'POLY']
+old_method = ['DenoisingAutoEncoder (DAE)', 'AutoEncoder (AE)', 'HBOS', 'COF', 'PCC', 'LOF', 'COPOD', 'CBLOF']
 	   
 oracle = ['GENIE', 'MORTY']
 
 methods_ens = [
-	'inception_time_default_{}_score',
-	'convnet_default_{}_score',
-	'resnet_default_{}_score',
-	'sit_conv_patch_{}_score',
-	'sit_linear_patch_{}_score',
-	'sit_stem_original_{}_score',
-	'sit_stem_relu_{}_score',
+	# 'inception_time_default_{}_score',
+	# 'convnet_default_{}_score',
+	# 'resnet_default_{}_score',
+	'convnet_{}_score',
+	'resnet_{}_score',
+	# 'sit_conv_patch_{}_score',
+	# 'sit_linear_patch_{}_score',
+	# 'sit_stem_original_{}_score',
+	# 'sit_stem_relu_{}_score',
 	'rocket_{}_score',
 	'ada_boost_{}_score',
 	'knn_{}_score',
@@ -84,10 +88,14 @@ methods_ens = [
 	'qda_{}_score',
 	'svc_linear_{}_score']
 
+# methods_conv = [
+# 	'inception_time_default_{}_score',
+# 	'convnet_default_{}_score',
+# 	'resnet_default_{}_score', ]
 methods_conv = [
-	'inception_time_default_{}_score',
-	'convnet_default_{}_score',
-	'resnet_default_{}_score', ]
+	# 'inception_time_{}_score',
+	'convnet_{}_score',
+	'resnet_{}_score', ]
 
 methods_sit = [
 	'sit_conv_patch_{}_score',
@@ -134,7 +142,7 @@ all_datasets = ['SMD', 'NAB', 'SVDB', 'SensorScope', 'GHL', 'Genesis', 'OPPORTUN
 
 
 method_group = {
-	   'Transformer': methods_sit,
+	   # 'Transformer': methods_sit,
 	   'Convolutional': methods_conv,
 	   'Rocket': methods_ts,
 	   'Features': methods_classical}

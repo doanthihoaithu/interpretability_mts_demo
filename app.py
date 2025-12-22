@@ -9,8 +9,8 @@ import streamlit as st
 from PIL import Image
 import pandas as pd
 from omegaconf import DictConfig
-# from st_pages import Page
-from streamlit import Page
+from st_pages import Page, show_pages
+# from streamlit import Page
 
 # from streamlit import Page
 
@@ -24,29 +24,45 @@ from utils.helper import init_names
 @hydra.main(config_path="conf", config_name="config.yaml")
 def main(config: DictConfig):
 # Specify what pages should be shown in the sidebar
-# 	show_pages(
-# 		[
-# 			# Page("app.py", "ADecimo", "🏠"),  # Home emoji is correct
-# 			# Page("pages/Accuracy.py", "Accuracy", "🎯"),  # Changed from :books: to a book emoji
-# 			Page("pages/Interpretability.py", "Interpretability", "🏠"),  # Changed to a brain emoji, more suitable for interpretability
-# 			# Page("pages/Datasets.py", "Datasets", "📊"),  # Changed to a chart emoji, more suitable for datasets
-# 			# Page("pages/Execution_Time.py", "Execution Time", "⏱️"),  # Changed to a stopwatch emoji, suitable for time
-# 			# Page("pages/Methods.py", "Methods", "🔧"),  # Changed to a tool emoji, suitable for methods or settings
-# 		]
-# 	)
+    show_pages(
+        [
+            Page("app.py", "Overall Results", "🏠"),  # Home emoji is correct
+            # Page("pages/Accuracy.py", "Accuracy", "🎯"),  # Changed from :books: to a book emoji
+            Page("pages/Interpretability.py", "Interpretability", "🏠"),  # Changed to a brain emoji, more suitable for interpretability
+            # Page("pages/Datasets.py", "Datasets", "📊"),  # Changed to a chart emoji, more suitable for datasets
+            # Page("pages/Execution_Time.py", "Execution Time", "⏱️"),  # Changed to a stopwatch emoji, suitable for time
+            # Page("pages/Methods.py", "Methods", "🔧"),  # Changed to a tool emoji, suitable for methods or settings
+        ]
+    )
 
-    pg = st.navigation([Page("pages/Interpretability.py")])
-    pg.run()
-
-
+    # pg = st.navigation([Page("pages/Interpretability.py")])
+    # pg.run()
 
 
-	# Setup
+
+    # Setup
 	# add_page_title() # Optional -- adds the title and icon to the current page
 	#
 	# st.title("Interpretability")
 	# # Show description of the Demo and main image
 	# st.markdown(description_intro)
+
+    image_path = "figures/AUC_PR.png"
+    image = Image.open(image_path)
+    st.image(image, caption='AUC_PR of detectors on synthetic datasets')
+
+    image_path = "figures/VUS_PR.png"
+    image = Image.open(image_path)
+    st.image(image, caption='VUS_PR of detectors on synthetic datasets')
+
+    image_path = "figures/INTERPRETABILITY_HIT_2_SCORE.png"
+    image = Image.open(image_path)
+    st.image(image, caption='INTERPRETABILITY_HIT_2_SCORE of detectors on synthetic datasets')
+
+
+    image_path = "figures/INTERPRETABILITY_LOG_SCORE.png"
+    image = Image.open(image_path)
+    st.image(image, caption='INTERPRETABILITY_LOG_SCORE of detectors on synthetic datasets')
 
 
 	# page_names_to_funcs = {
@@ -81,5 +97,6 @@ def main(config: DictConfig):
 	# df_time_train = pd.read_csv('data/training_times.csv', index_col='window_size')
 	# final_names = init_names(list_length, template_names)
 
+
 if __name__ == '__main__':
-	main()
+    main()
