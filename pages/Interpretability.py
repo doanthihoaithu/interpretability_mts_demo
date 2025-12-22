@@ -18,8 +18,8 @@ from utils.helper import generate_dataframe, plot_box_plot, add_rect, plot_batch
 
 # Page Configuration and Title
 st.markdown('# Interpretability Evaluation')
-st.markdown('Overall evaluation of 125 classification algorithms used for model selection for anomaly detection. '
-			'We utilize 496 randomly selected time series from the TSB-UAD benchmark.')
+# st.markdown('Overall evaluation of 125 classification algorithms used for model selection for anomaly detection.
+# We utilize 496 randomly selected time series from the TSB-UAD benchmark.')
 
 mts_data_dir = 'data/mts/settings_one/data'
 mts_scores_dir = 'data/mts/settings_one/scores'
