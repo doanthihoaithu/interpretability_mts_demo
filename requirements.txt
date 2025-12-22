@@ -2,3 +2,4 @@ st_pages
 streamlit
 pandas
 numpy
+plotly
