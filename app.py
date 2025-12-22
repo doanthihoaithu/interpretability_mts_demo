@@ -35,7 +35,7 @@ def main(config: DictConfig):
 #         ]
 #     )
 
-    pg = st.navigation([Page("pages/Interpretability.py")])
+    pg = st.navigation([Page("pages/Overview.py"), Page("pages/Interpretability.py")])
     pg.run()
 
 
@@ -46,23 +46,6 @@ def main(config: DictConfig):
 	# st.title("Interpretability")
 	# # Show description of the Demo and main image
 	# st.markdown(description_intro)
-
-    image_path = "figures/AUC_PR.png"
-    image = Image.open(image_path)
-    st.image(image, caption='AUC_PR of detectors on synthetic datasets')
-
-    image_path = "figures/VUS_PR.png"
-    image = Image.open(image_path)
-    st.image(image, caption='VUS_PR of detectors on synthetic datasets')
-
-    image_path = "figures/INTERPRETABILITY_HIT_2_SCORE.png"
-    image = Image.open(image_path)
-    st.image(image, caption='INTERPRETABILITY_HIT_2_SCORE of detectors on synthetic datasets')
-
-
-    image_path = "figures/INTERPRETABILITY_LOG_SCORE.png"
-    image = Image.open(image_path)
-    st.image(image, caption='INTERPRETABILITY_LOG_SCORE of detectors on synthetic datasets')
 
 
 	# page_names_to_funcs = {
