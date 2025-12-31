@@ -233,7 +233,7 @@ def plot_batch_mts(df, multivariate_labels_df, scores_dfs_dict, contribution_dfs
 						   mode='lines', name=f"{method_name} score", xaxis='x', yaxis=f'y{num_series+1}',
 								   # customdata=['a:1, b:2, c:3'] * len(scores_df),
 								   customdata=customdata,
-								   hovertemplate="%{y:.4f}<br><b>Contribution</b>: %{customdata}"
+								   hovertemplate="%{y:.4f}<br><b> Testing Contribution</b>: %{customdata}"
 								   ),)
 
 	layout = dict(
